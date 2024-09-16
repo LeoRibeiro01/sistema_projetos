@@ -1,41 +1,87 @@
 <?php
 
-namespace App\Models;
+namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use App\Models\Project;
+use App\Models\Cliente;
 
-class Project extends Model
+class ProjectController extends Controller
 {
-    use HasFactory;
-
-    // Definir o nome da tabela, se for diferente do plural do nome da model
-    protected $table = 'projects';
-
-    // Atributos que podem ser preenchidos em massa
-    protected $fillable = [
-        'titulo',
-        'descricao',
-        'data_inicio',
-        'data_termino',
-        'cliente_id',
-    ];
-
-    // Definir os tipos dos atributos
-    protected $casts = [
-        'data_inicio' => 'datetime',
-        'data_termino' => 'datetime',
-    ];
-
-    // Relacionamento com a model Cliente
-    public function cliente()
+    // Exibe uma lista de todos os projetos
+    public function index()
     {
-        return $this->belongsTo(User::class, 'cliente_id');
+        $projects = Project::all(); // Lista todos os projetos
+        return view('projects.index', compact('projects'));
     }
 
-    public function tarefas()
+    // Mostra o formulário para criar um novo projeto
+    public function create()
     {
-        return $this->hasMany(Tarefa::class);
+        $clientes = Cliente::orderBy('nome')->get(); // Busca clientes ordenados
+        return view('projects.create', compact('clientes'));
     }
 
+    // Armazena um novo projeto no banco de dados
+    public function store(Request $request)
+    {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'data_inicio' => 'required|date',
+            'data_termino' => 'nullable|date',
+            'cliente_id' => 'required|exists:clientes,id',
+        ]);
+
+        $project = new Project();
+        $project->titulo = mb_strtoupper($request->titulo, 'UTF-8');
+        $project->descricao = $request->descricao;
+        $project->data_inicio = $request->data_inicio;
+        $project->data_termino = $request->data_termino;
+        $project->cliente_id = $request->cliente_id;
+        $project->save();
+
+        return redirect()->route('projects.index');
+    }
+
+    // Exibe os detalhes de um projeto específico
+    public function show(Project $project)
+    {
+        return view('projects.show', compact('project'));
+    }
+
+    // Mostra o formulário para editar um projeto existente
+    public function edit(Project $project)
+    {
+        $clientes = Cliente::all(); // Busca todos os clientes
+        return view('projects.edit', compact('project', 'clientes'));
+    }
+
+    // Atualiza um projeto existente no banco de dados
+    public function update(Request $request, Project $project)
+    {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'data_inicio' => 'required|date',
+            'data_termino' => 'nullable|date',
+            'cliente_id' => 'required|exists:clientes,id',
+        ]);
+
+        $project->titulo = mb_strtoupper($request->titulo, 'UTF-8');
+        $project->descricao = $request->descricao;
+        $project->data_inicio = $request->data_inicio;
+        $project->data_termino = $request->data_termino;
+        $project->cliente_id = $request->cliente_id;
+        $project->save();
+
+        return redirect()->route('projects.index');
+    }
+
+    // Remove um projeto do banco de dados
+    public function destroy(Project $project)
+    {
+        $project->delete();
+        return redirect()->route('projects.index');
+    }
 }

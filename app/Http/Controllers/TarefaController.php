@@ -18,8 +18,8 @@ class TarefaController extends Controller
     // Mostra o formulário para criar uma nova tarefa
     public function create()
     {
-        $project = Project::orderBy('titulo')->get();
-        return view('tarefas.create', compact('project'));
+        $project = Projects::all();
+        return view('tarefas.create', compact('projects'));
     }
 
     // Armazena uma nova tarefa no banco de dados

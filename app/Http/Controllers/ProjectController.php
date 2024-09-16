@@ -13,7 +13,6 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::all();
-        $projects = Auth::user()->projects; // Supondo que o relacionamento está definido
         return view('projects.index', compact('projects'));
     }
 
@@ -21,7 +20,7 @@ class ProjectController extends Controller
     public function create()
     {
         $clientes = Cliente::orderBy('nome')->get();
-        return view('project.create', compact('clientes'));
+        return view('projects.create', compact('clientes'));
     }
 
     // Armazena um novo projeto no banco de dados
@@ -49,9 +48,6 @@ class ProjectController extends Controller
     // Exibe os detalhes de um projeto específico
     public function show(Project $project)
     {
-        if ($project->cliente_id !== Auth::id()) {
-            abort(403);
-        }
         return view('projects.show', compact('project'));
     }
 

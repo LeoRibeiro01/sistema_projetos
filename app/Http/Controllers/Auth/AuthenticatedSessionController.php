@@ -20,43 +20,29 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function store(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            return redirect()->intended('home');
-        }
-        return redirect()->back()->withErrors(['email' => 'Credenciais inválidas']);
+        $request->authenticate();
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::HOME);
     }
 
-    public function showRegistrationForm()
+    /**
+     * Destroy an authenticated session.
+     */
+    public function destroy(Request $request): RedirectResponse
     {
-        return view('auth.register');
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        Auth::attempt($request->only('email', 'password'));
-
-        return redirect()->intended('home');
-    }
-
-    public function logout()
-    {
-        Auth::logout();
-        return redirect('/login');
-    }
-    }
-
+}

@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserController extends Controller
 {
     // Exibe uma lista de todos os usuários
     public function index()
     {
-        $users = User::all();
+        $users = User::all(); // Lista todos os usuários
         return view('users.index', compact('users'));
     }
 
@@ -25,17 +25,23 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
-        ]);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso.');
+        return redirect()->route('users.index');
+    }
+
+    // Exibe os detalhes de um usuário específico
+    public function show(User $user)
+    {
+        return view('users.show', compact('user'));
     }
 
     // Mostra o formulário para editar um usuário existente
@@ -49,32 +55,24 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->input('password'));
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->password) {
+            $user->password = bcrypt($request->password);
         }
-
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
-    }
-
-    // Exibe os detalhes de um usuário
-    public function show(User $user)
-    {
-        return view('users.show', compact('user'));
+        return redirect()->route('users.index');
     }
 
     // Remove um usuário do banco de dados
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso.');
+        return redirect()->route('users.index');
     }
 }
