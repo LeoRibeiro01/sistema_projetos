@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< HEAD
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TarefaController;
@@ -47,3 +48,10 @@ Route::post('register', [RegisterController::class, 'register']);
 
 // Auth routes
 require __DIR__.'/auth.php';
+=======
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+>>>>>>> f9453e5b6412aa397c6d1ab2421f34192d313e83
