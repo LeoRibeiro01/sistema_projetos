@@ -6,18 +6,12 @@
     "license": "MIT",
     "require": {
 "require": {
-<<<<<<< HEAD
+    
     "php": "^8.2",
     "guzzlehttp/guzzle": "^7.2",
     "laravel/framework": "^11.9",
     "laravel/sanctum": "^3.2",
     "laravel/tinker": "^2.9"
-=======
-    "php": "^8.2",
-    "laravel/framework": "^11.9",
-    "laravel/tinker": "^2.9"
->>>>>>> f9453e5b6412aa397c6d1ab2421f34192d313e83
-},
 
     "autoload": {
         "psr-4": {
